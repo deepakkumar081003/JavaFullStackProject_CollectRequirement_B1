@@ -29,7 +29,7 @@ public class UserInfo {
     @ManyToOne
     private Region region;
 
-    //doubt
+    //doubt need to be asked :Dharshan
     @OneToOne
     @JoinColumn(name = "managerId",referencedColumnName = "userId")
     private UserInfo manager;
