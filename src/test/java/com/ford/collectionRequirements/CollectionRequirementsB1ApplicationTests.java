@@ -1,4 +1,4 @@
-package com.example.collectionRequirements;
+package com.ford.collectionRequirements;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
