@@ -6,4 +6,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/approvals")
 public class ApprovalController {
+    //This is a placeholder for ApprovalController
 }
