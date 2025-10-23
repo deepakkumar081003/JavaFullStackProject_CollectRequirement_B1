@@ -56,9 +56,9 @@ public class UserInfo {
     @JsonIgnore // Prevent recursion for self-reference
     private List<Request> requests;
 
-    @OneToOne(mappedBy = "approvedBy")
+    @OneToMany(mappedBy = "approvedBy")
     @JsonIgnore // Prevent recursion for self-reference
-    private Approval approval;
+    private List<Approval> approval;
 
 
 }
