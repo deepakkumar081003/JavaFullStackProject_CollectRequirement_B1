@@ -27,7 +27,7 @@ public class Approval {
     @JsonIgnore // Prevent recursion
     private Request request;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="approved_by", referencedColumnName = "user_id")
     @JsonIgnore // Prevent recursion
     private UserInfo approvedBy;
