@@ -1,5 +1,6 @@
 package com.ford.collectionRequirements.department;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ford.collectionRequirements.request.Request;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -34,9 +35,11 @@ public class Department {
     //private Budget budget
 
     @OneToMany(mappedBy = "department")
+    @JsonIgnore
     private List<UserInfo> users;
 
     @OneToMany(mappedBy = "department")
+    @JsonIgnore
     private List<Request> requests;
 
 }
