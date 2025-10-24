@@ -109,11 +109,6 @@ public class RequestController {
         }
     }
 
-    private RequestService requestService;
-    @Autowired
-    public RequestController(RequestService requestService) {
-        this.requestService = requestService;
-    }
 
     @PutMapping("/{requestId}")
     public ResponseEntity<Request> updateRequest(@RequestBody EditRequestDTO editRequestDTO) {
@@ -134,13 +129,14 @@ public class RequestController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-}
+
 
     @GetMapping("/users/ids-names")
     public ResponseEntity<List<BasicUserDTO>> getAllUsersIdAndName() {
         List<BasicUserDTO> users = requestService.getAllUsersIdAndName();
         return ResponseEntity.ok(users);
     }
+
 }
 
 
