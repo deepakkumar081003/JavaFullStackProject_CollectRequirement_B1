@@ -52,7 +52,7 @@ public class EventServiceImpl implements EventService {
 
         existingEvent.setEventName(updatedEvent.getEventName());
         existingEvent.setDescription(updatedEvent.getDescription());
-        existingEvent.setParticipantsCount(updatedEvent.getParticipantsCount());
+//        existingEvent.setParticipantsCount(updatedEvent.getParticipantsCount());
         existingEvent.setDuration(updatedEvent.getDuration());
         existingEvent.setEventType(updatedEvent.getEventType());
         existingEvent.setFundingSource(updatedEvent.getFundingSource());

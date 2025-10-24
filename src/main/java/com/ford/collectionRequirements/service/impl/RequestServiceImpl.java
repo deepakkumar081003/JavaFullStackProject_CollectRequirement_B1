@@ -37,6 +37,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
+    @Transactional
     public Request updateRequest( EditRequestDTO editRequestDTO) {
 
         Request existingRequest = requestRepository.findById(editRequestDTO.getRequestId())
@@ -46,12 +47,16 @@ public class RequestServiceImpl implements RequestService {
 
         Department department = departmentRepository.findById(editRequestDTO.getDepartmentId())
                 .orElseThrow(() -> new EntityNotFoundException("Department not found with id: " + editRequestDTO.getDepartmentId()));
-        Event event = eventRepository.findById(editRequestDTO.getEventId())
-                .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + editRequestDTO.getEventId()));
+
+        if(editRequestDTO.getEventId() != null) {
+            Event event = eventRepository.findById(editRequestDTO.getEventId())
+                    .orElseThrow(() -> new EntityNotFoundException("Event not found with id: " + editRequestDTO.getEventId()));
+            existingRequest.setEvent(event);
+        }
 
         existingRequest.setUser(requestor);
         existingRequest.setDepartment(department);
-        existingRequest.setEvent(event);
+//        existingRequest.setEvent(event);
         existingRequest.setRequestDate(LocalDate.now());
         existingRequest.setRequestStatus(editRequestDTO.getRequestStatus());
         existingRequest.setGroupRequest(editRequestDTO.getGroupRequest());
@@ -60,23 +65,19 @@ public class RequestServiceImpl implements RequestService {
         existingRequest.setCurriculamLink(editRequestDTO.getCurriculamLink());
         existingRequest.setNoOfParticipants((long) editRequestDTO.getRequestedParticipants().size());
 
-        for (UserInfo participant: existingRequest.getRequestedParticipants())
-        {
-            if( !editRequestDTO.getRequestedParticipants().contains(participant.getUserId()))
-            {
-                existingRequest.getRequestedParticipants().remove(participant);
+        java.util.Iterator<UserInfo> iterator = existingRequest.getRequestedParticipants().iterator();
+        while (iterator.hasNext()) {
+            UserInfo participant = iterator.next();
+            if (!editRequestDTO.getRequestedParticipants().contains(participant.getUserId())) {
+                iterator.remove();
             }
-
         }
-        for (Long participantId: editRequestDTO.getRequestedParticipants())
-        {
-            UserInfo participant= userInfoRepository.findById(participantId)
+        for (Long participantId : editRequestDTO.getRequestedParticipants()) {
+            UserInfo participant = userInfoRepository.findById(participantId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + participantId));
-            if( !existingRequest.getRequestedParticipants().contains(participant))
-            {
+            if (!existingRequest.getRequestedParticipants().contains(participant)) {
                 existingRequest.getRequestedParticipants().add(participant);
             }
-
         }
         if ("Approved".equals(existingRequest.getRequestStatus()) || "Rejected".equals(existingRequest.getRequestStatus())) {
             Approval approval = approvalRepository.findByRequest_RequestId(existingRequest.getRequestId());
