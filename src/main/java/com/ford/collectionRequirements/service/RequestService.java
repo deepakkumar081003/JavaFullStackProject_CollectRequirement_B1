@@ -8,6 +8,9 @@ import com.ford.collectionRequirements.dto.RequestDetailsDTO;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.ford.collectionRequirements.dto.EditRequestDTO;
+import com.ford.collectionRequirements.request.Request;
+
 public interface RequestService {
     List<RequestDetailsDTO> getAllRequests(
             Long ldUserId,
@@ -35,4 +38,6 @@ public interface RequestService {
     RequestCountsDTO getAllRequestsSummaryCounts(Long requestorId);
 
     List<BasicUserDTO> getAllUsersIdAndName();
+    Request updateRequest( EditRequestDTO editRequestDTO);
+    void deleteRequest(Long requestId);
 }

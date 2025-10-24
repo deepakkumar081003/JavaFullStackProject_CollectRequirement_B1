@@ -28,8 +28,8 @@ public class Request {
     private Long requestId;
 
     @ManyToOne
-    @JoinColumn(name = "requestor_id")
     @JsonIgnore
+    @JoinColumn(name = "requestor_id")
     private UserInfo user;
 
     @ManyToOne
@@ -40,7 +40,7 @@ public class Request {
     @JoinColumn(name = "event_id")
     private Event event;
 
-    @OneToOne(mappedBy = "request")
+    @OneToOne(mappedBy = "request", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore // Inverse side of one-to-one
     private Approval approval;
 

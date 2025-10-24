@@ -60,9 +60,10 @@ public class UserInfo {
     @JsonIgnore // Prevent recursion for self-reference
     private List<Approval> approval;
 
-    @OneToMany(mappedBy="user")
+    @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Request> lcRequests;
+
 
 
 }

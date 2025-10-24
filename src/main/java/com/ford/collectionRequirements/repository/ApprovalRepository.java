@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ApprovalRepository extends JpaRepository<Approval,Integer> {
+    Approval findByRequest_RequestId(Long requestId);
 }
