@@ -1,5 +1,6 @@
 package com.ford.collectionRequirements.region;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,6 +30,7 @@ public class Region {
     private String location;
 
     @OneToMany(mappedBy = "region")
+    @JsonIgnore
     private List<UserInfo> users;
 
 }

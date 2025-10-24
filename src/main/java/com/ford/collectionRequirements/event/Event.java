@@ -1,5 +1,6 @@
 package com.ford.collectionRequirements.event;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ford.collectionRequirements.request.Request;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,7 @@ public class Event {
     private String description;
 
     @OneToMany(mappedBy="event")
+    @JsonIgnore
     private List<Request> requests;
 
     @Column(name="participants_count")
