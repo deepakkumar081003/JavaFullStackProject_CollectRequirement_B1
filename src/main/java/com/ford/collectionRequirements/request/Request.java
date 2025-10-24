@@ -27,8 +27,9 @@ public class Request {
     @Column(name = "request_id")
     private Long requestId;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "requestor_id")
+    @JsonIgnore
     private UserInfo user;
 
     @ManyToOne
