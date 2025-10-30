@@ -53,7 +53,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<RequestDetailsDTO> getAllRequests(Long ldUserId, String status, Integer departmentId, Long eventId, Long requestorId , LocalDate fromDate, LocalDate toDate) {
+    public List<RequestDetailsDTO> getAllRequests(Long ldUserId, String status, String departmentName,String eventName, String requestorName , LocalDate fromDate, LocalDate toDate) {
 
         if(ldUserId < 21 || ldUserId > 26){
             throw new SecurityException("Unauthorized access. Admin privileges required.");
@@ -65,15 +65,27 @@ public class RequestServiceImpl implements RequestService {
             if (status != null && !status.isEmpty()) {
                 predicates.add(criteriaBuilder.equal(root.get("requestStatus"), status));
             }
-            if(departmentId != null) {
-                predicates.add(criteriaBuilder.equal(root.get("department").get("departmentId"), departmentId));
+            if(departmentName != null) {
+                predicates.add(criteriaBuilder.equal(root.get("department").get("departmentName"), departmentName));
             }
-            if (eventId != null) {
-                predicates.add(criteriaBuilder.equal(root.get("event").get("eventId"), eventId));
+            if (eventName != null) {
+                predicates.add(criteriaBuilder.equal(root.get("event").get("eventName"), eventName));
             }
-            if(requestorId != null) {
-                predicates.add(criteriaBuilder.equal(root.get("user").get("userId"), requestorId));
+            if (requestorName != null && !requestorName.isEmpty()) {
+                String[] nameParts = requestorName.trim().split("\\s+");
+                if (nameParts.length == 2) {
+                    predicates.add(criteriaBuilder.and(
+                            criteriaBuilder.equal(root.get("user").get("firstName"), nameParts[0]),
+                            criteriaBuilder.equal(root.get("user").get("lastName"), nameParts[1])
+                    ));
+                } else {
+                    predicates.add(criteriaBuilder.or(
+                            criteriaBuilder.equal(root.get("user").get("firstName"), requestorName),
+                            criteriaBuilder.equal(root.get("user").get("lastName"), requestorName)
+                    ));
+                }
             }
+
             if (fromDate != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("requestDate"), fromDate));
             }
@@ -93,10 +105,12 @@ public class RequestServiceImpl implements RequestService {
         dto.setRequestId(request.getRequestId());
         if (request.getUser() != null) {
             dto.setRequestorId(request.getUser().getUserId());
+            dto.setRequestorName(request.getUser().getFirstName() + " " + request.getUser().getLastName());
 
         }
         if (request.getDepartment() != null) {
             dto.setDepartmentId(request.getDepartment().getDepartmentId());
+            dto.setDepartmentName(request.getDepartment().getDepartmentName());
 
         }
         if (request.getEvent() != null) {
@@ -131,8 +145,8 @@ public class RequestServiceImpl implements RequestService {
     public List<RequestDetailsDTO> getFilteredRequests(
             Long lcUserId,
             String status,
-            Integer departmentId,
-            Long eventId, // Added eventId parameter
+            String departmentName,
+            String eventName,
             LocalDate fromDate,
             LocalDate toDate
     ) {
@@ -147,11 +161,11 @@ public class RequestServiceImpl implements RequestService {
             if (status != null && !status.isEmpty()) {
                 predicates.add(criteriaBuilder.equal(root.get("requestStatus"), status));
             }
-            if(departmentId != null) {
-                predicates.add(criteriaBuilder.equal(root.get("department").get("departmentId"), departmentId));
+            if(departmentName != null) {
+                predicates.add(criteriaBuilder.equal(root.get("department").get("departmentName"), departmentName));
             }
-            if (eventId != null) {
-                predicates.add(criteriaBuilder.equal(root.get("event").get("eventId"), eventId));
+            if (eventName != null) {
+                predicates.add(criteriaBuilder.equal(root.get("event").get("eventName"), eventName));
             }
             if (fromDate != null) {
                 predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("requestDate"), fromDate));
@@ -171,10 +185,12 @@ public class RequestServiceImpl implements RequestService {
                     dto.setRequestId(request.getRequestId());
                     if (request.getUser() != null) {
                         dto.setRequestorId(request.getUser().getUserId());
+                        dto.setRequestorName(request.getUser().getFirstName() + " " + request.getUser().getLastName());
 
                     }
                     if (request.getDepartment() != null) {
                         dto.setDepartmentId(request.getDepartment().getDepartmentId());
+                        dto.setDepartmentName(request.getDepartment().getDepartmentName());
 
                     }
                     if (request.getEvent() != null) {
@@ -265,7 +281,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<BasicUserDTO> getAllUsersIdAndName() {
+    public List<BasicUserDTO> getAllUsers() {
 
         List<UserInfo> users=userInfoRepository.findAll();
 
@@ -279,8 +295,11 @@ public class RequestServiceImpl implements RequestService {
                     dto.setRole(user.getRole());
                     dto.setEmail(user.getEmail());
                     dto.setDepartmentId(user.getDepartment().getDepartmentId());
+                    dto.setDepartmentName(user.getDepartment().getDepartmentName());
                     dto.setManagerId(user.getManager().getUserId());
+                    dto.setManagerName(user.getManager().getFirstName() + " " + user.getManager().getLastName());
                     dto.setRegionId(user.getRegion().getRegionId());
+                    dto.setRegionName(user.getRegion().getRegionName());
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -342,7 +361,11 @@ public class RequestServiceImpl implements RequestService {
                 approval.setRequest(existingRequest);
             }
             approval.setApprovalDate(LocalDate.now());
-            approval.setApprovedBy(requestor);
+
+            UserInfo approver=userInfoRepository.findById(editRequestDTO.getApprovedBy())
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + editRequestDTO.getApprovedBy()));
+            approval.setApprovedBy(approver);
+
             approval.setApprovalStatus(existingRequest.getRequestStatus());
             approvalRepository.save(approval);
         }

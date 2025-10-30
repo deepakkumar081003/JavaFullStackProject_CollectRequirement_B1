@@ -14,6 +14,7 @@ import java.util.List;
 public class EditRequestDTO {
     private Long requestId;
     private Long requestorId;
+    private Long approvedBy;
     private Long departmentId;
     private Long eventId;
     private Date requestDate;

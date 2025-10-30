@@ -15,9 +15,9 @@ public interface RequestService {
     List<RequestDetailsDTO> getAllRequests(
             Long ldUserId,
             String status,
-            Integer departmentId,
-            Long eventId,
-            Long requestorId,
+            String departmentName,
+            String eventName,
+            String requestorName,
             LocalDate fromDate,
             LocalDate toDate
     );
@@ -26,8 +26,8 @@ public interface RequestService {
     List<RequestDetailsDTO> getFilteredRequests(
             Long requestorId,
             String status,
-            Integer departmentId,
-            Long eventId,
+            String departmentName,
+            String eventName,
             LocalDate fromDate,
             LocalDate toDate
     );
@@ -37,7 +37,7 @@ public interface RequestService {
 
     RequestCountsDTO getAllRequestsSummaryCounts(Long requestorId);
 
-    List<BasicUserDTO> getAllUsersIdAndName();
+    List<BasicUserDTO> getAllUsers();
     Request updateRequest( EditRequestDTO editRequestDTO);
     void deleteRequest(Long requestId);
 }
