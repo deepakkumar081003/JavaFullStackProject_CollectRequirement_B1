@@ -115,7 +115,7 @@ public class RequestServiceImpl implements RequestService {
         }
         if (request.getEvent() != null) {
             dto.setEventId(request.getEvent().getEventId());
-
+            dto.setEventName(request.getEvent().getEventName());
         }
         dto.setRequestDate(request.getRequestDate());
         dto.setRequestStatus(request.getRequestStatus());
@@ -195,7 +195,7 @@ public class RequestServiceImpl implements RequestService {
                     }
                     if (request.getEvent() != null) {
                         dto.setEventId(request.getEvent().getEventId());
-
+                        dto.setEventName(request.getEvent().getEventName());
                     }
                     dto.setRequestDate(request.getRequestDate());
                     dto.setRequestStatus(request.getRequestStatus());
