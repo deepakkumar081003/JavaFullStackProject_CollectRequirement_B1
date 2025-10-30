@@ -14,8 +14,11 @@ public class RequestDetailsDTO {
 
     private Long requestId;
     private Long requestorId; // From UserInfo
+    private String requestorName; // From UserInfo
     private Integer departmentId; // From Department
+    private String departmentName;
     private Long eventId; // From Event
+    private String eventName;
     private LocalDate requestDate;
     private String requestStatus;
     private Boolean groupRequest;
@@ -23,8 +26,6 @@ public class RequestDetailsDTO {
     private Long noOfParticipants;
     private String tanNumber;
     private String curriculumLink;
-
-
 
 
 }
