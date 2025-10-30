@@ -13,8 +13,11 @@ public class BasicUserDTO {
     private String userName;
     private String email;
     private Integer departmentId;
+    private String departmentName;
     private String role;
     private Long regionId;
+    private String regionName;
     private Long managerId;
+    private String managerName;
 
 }
