@@ -1,6 +1,7 @@
 package com.ford.collectionRequirements.controller;
 
 
+import com.ford.collectionRequirements.dto.EventDTO;
 import com.ford.collectionRequirements.request.Request;
 import com.ford.collectionRequirements.dto.EventCreationRequestDTO;
 import com.ford.collectionRequirements.event.Event;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/events")
+@CrossOrigin("http://localhost:4200/")
 public class EventController {
 
 
@@ -71,8 +73,13 @@ public class EventController {
     }
 
     @GetMapping
-    public List<Event> getAllEvents() {
-        return this.eventService.getAllEvents();
+    public List<EventDTO> getAllEvents(
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) String description,
+            @RequestParam(required = false) String eventType,
+            @RequestParam(required = false) String status
+    ) {
+        return this.eventService.getAllEvents(searchTerm, description, eventType, status);
     }
 
     //FOR CREATING A NEW EVENT

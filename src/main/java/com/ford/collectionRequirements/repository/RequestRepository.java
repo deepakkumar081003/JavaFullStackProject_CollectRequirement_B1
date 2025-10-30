@@ -19,7 +19,7 @@ public interface RequestRepository extends JpaRepository<Request,Long> {
     @Query("SELECT request FROM Request request WHERE request.requestStatus = 'APPROVED' and request.event IS NULL ")
     Collection<Request> getAllNewApprovedRequestsNotAssignedToEvent();
 
-    List<Request> findByJustificationContains(String requestName);
+    List<Request> findByJustificationContainsIgnoreCase(String requestName);
 
     List<Request> findByEvent(Event event);
 

@@ -1,5 +1,6 @@
 package com.ford.collectionRequirements.service.impl;
 
+import com.ford.collectionRequirements.dto.EventDTO;
 import com.ford.collectionRequirements.event.Event;
 import com.ford.collectionRequirements.dto.EventCreationRequestDTO;
 import com.ford.collectionRequirements.event.Event;
@@ -11,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class EventServiceImpl implements EventService {
@@ -91,12 +94,44 @@ public class EventServiceImpl implements EventService {
         return requestRepository.save(request);
     }
 
+    public List<EventDTO> getAllEvents(
+            String searchTerm,
+            String description,
+            String eventType,
+            String status
+    ) {
+        // Convert empty strings to null so the JPA query's IS NULL check works.
+        // StringUtils.hasText() checks for non-null, non-empty, non-whitespace strings.
+        String effectiveSearchTerm = StringUtils.hasText(searchTerm) ? searchTerm : null;
+        String effectiveDescription = StringUtils.hasText(description) ? description : null;
+        String effectiveEventType = StringUtils.hasText(eventType) ? eventType : null;
+        String effectiveStatus = StringUtils.hasText(status) ? status : null;
 
+        List<Event> events = eventRepository.findByFilters(
+                effectiveSearchTerm,
+                effectiveDescription,
+                effectiveEventType,
+                effectiveStatus
+        );
 
-    @Override
-    public List<Event> getAllEvents() {
-        List<Event> events = eventRepository.findAll();
-        return events;
+        return events.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    // This method converts your JPA Entity 'Event' to your DTO 'EventDTO'
+    public EventDTO convertToDto(Event event) {
+        EventDTO dto = new EventDTO();
+        dto.setEventId(event.getEventId()); // Assuming your Event entity has getEventId()
+        dto.setEventName(event.getEventName());
+        dto.setDescription(event.getDescription());
+        dto.setParticipantsCount(event.getParticipantsCount());
+        dto.setDuration(event.getDuration());
+        dto.setEventType(event.getEventType());
+        dto.setFundingSource(event.getFundingSource());
+        dto.setStatus(event.getStatus());
+        // request_id is intentionally omitted as per previous discussions
+        return dto;
     }
 
     @Override
@@ -144,7 +179,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<Request> getAllRequestsForSeachByName(String requestName) {
-        return this.requestRepository.findByJustificationContains(requestName);
+        return this.requestRepository.findByJustificationContainsIgnoreCase(requestName);
     }
 
     @Override
