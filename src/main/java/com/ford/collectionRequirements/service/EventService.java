@@ -1,5 +1,6 @@
 package com.ford.collectionRequirements.service;
 
+import com.ford.collectionRequirements.dto.EventDTO;
 import com.ford.collectionRequirements.event.Event;
 import com.ford.collectionRequirements.request.Request;
 
@@ -18,7 +19,14 @@ public interface EventService {
     Request assignExistingRequestToEvent(Long requestId, Long eventId);
     Request removeExistingRequestFromEvent(Long eventId, Long requestId);
 
-    List<Event> getAllEvents();
+    List<EventDTO> getAllEvents(
+            String searchTerm,
+            String description,
+            String eventType,
+            String status
+    );
+
+    EventDTO convertToDto(Event event);
 
     Event createEvent(EventCreationRequestDTO eventCreationRequestDTO);
 
