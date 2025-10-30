@@ -335,7 +335,7 @@ public class RequestServiceImpl implements RequestService {
                 existingRequest.getRequestedParticipants().add(participant);
             }
         }
-        if ("Approved".equals(existingRequest.getRequestStatus()) || "Rejected".equals(existingRequest.getRequestStatus())) {
+        if ("APPROVED".equals(existingRequest.getRequestStatus()) || "REJECTED".equals(existingRequest.getRequestStatus())) {
             Approval approval = approvalRepository.findByRequest_RequestId(existingRequest.getRequestId());
             if (approval == null) {
                 approval = new Approval();

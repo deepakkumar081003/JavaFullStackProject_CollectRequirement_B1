@@ -22,6 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/events")
+@CrossOrigin("http://localhost:4200/")
 public class EventController {
 
 
