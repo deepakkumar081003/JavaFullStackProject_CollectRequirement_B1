@@ -36,18 +36,18 @@ public class RequestController {
     }
 
     //To get the all the requests submitted by the requestors with filters
-    @GetMapping("/all/user/{ldUserId}")
+    @GetMapping("/all/{ldUserId}")
     public ResponseEntity<List<RequestDetailsDTO>> getAllRequestByUserIdWithFilters(
             @PathVariable Long ldUserId,
             @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "departmentId", required = false) Integer departmentId,
-            @RequestParam(value = "eventId", required = false) Long eventId,
-            @RequestParam(value ="requestorId", required = false) Long requestorId,
+            @RequestParam(value = "departmentName", required = false) String departmentName,
+            @RequestParam(value = "eventName", required = false) String eventName,
+            @RequestParam(value ="requestorName", required = false) String requestorName,
             @RequestParam(value = "fromDate", required = false) LocalDate fromDate,
             @RequestParam(value = "toDate", required = false) LocalDate toDate
             ) {
         try {
-            List<RequestDetailsDTO> requests = requestService.getAllRequests(ldUserId, status, departmentId, eventId, requestorId,fromDate, toDate);
+            List<RequestDetailsDTO> requests = requestService.getAllRequests(ldUserId, status, departmentName, eventName, requestorName,fromDate, toDate);
 
             if (requests.isEmpty()) {
                 return ResponseEntity.ok(requests); // Return 200 OK with an empty list
@@ -58,13 +58,13 @@ public class RequestController {
         }
     }
 
-    @GetMapping("/summary/user/{lcUserId}")
+    @GetMapping("/counts/{lcUserId}")
     public ResponseEntity<RequestCountsDTO> getRequestSummaryForUser(@PathVariable Long lcUserId) {
         RequestCountsDTO counts = requestService.getRequestSummaryCounts(lcUserId);
         return ResponseEntity.ok(counts);
     }
 
-    @GetMapping("all/summary/user/{ldUserId}")
+    @GetMapping("all/counts/{ldUserId}")
     public ResponseEntity<RequestCountsDTO> getAllRequestSummaryForUser(@PathVariable Long ldUserId) {
         try {
             RequestCountsDTO counts = requestService.getAllRequestsSummaryCounts(ldUserId);
@@ -76,17 +76,17 @@ public class RequestController {
     }
 
     //GetMapping for all requests with filters(status,date range,department(id),event(id))
-    @GetMapping("/user/{lcUserId}") // Renamed path variable for clarity
+    @GetMapping("/{lcUserId}") // Renamed path variable for clarity
     public ResponseEntity<List<RequestDetailsDTO>> getRequestsByUserIdWithFilters(
             @PathVariable Long lcUserId,
             @RequestParam(value = "status", required = false) String status,
-            @RequestParam(value = "departmentId", required = false) Integer departmentId,
-            @RequestParam(value = "eventId", required = false) Long eventId,
+            @RequestParam(value = "departmentName", required = false) String departmentName,
+            @RequestParam(value = "eventName", required = false) String eventName,
             @RequestParam(value = "fromDate", required = false) LocalDate fromDate,
             @RequestParam(value = "toDate", required = false) LocalDate toDate
     ) {
         List<RequestDetailsDTO> requests = requestService.getFilteredRequests(
-                lcUserId, status, departmentId, eventId, fromDate, toDate);
+                lcUserId, status, departmentName, eventName, fromDate, toDate);
 
         if (requests.isEmpty()) {
             return ResponseEntity.ok(requests); // Return 200 OK with an empty list
@@ -131,9 +131,9 @@ public class RequestController {
     }
 
 
-    @GetMapping("/users/ids-names")
-    public ResponseEntity<List<BasicUserDTO>> getAllUsersIdAndName() {
-        List<BasicUserDTO> users = requestService.getAllUsersIdAndName();
+    @GetMapping("/users")
+    public ResponseEntity<List<BasicUserDTO>> getAllUsers() {
+        List<BasicUserDTO> users = requestService.getAllUsers();
         return ResponseEntity.ok(users);
     }
 
