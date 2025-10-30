@@ -115,6 +115,7 @@ public class RequestServiceImpl implements RequestService {
         }
         if (request.getEvent() != null) {
             dto.setEventId(request.getEvent().getEventId());
+            dto.setEventName(request.getEvent().getEventName());
 
         }
         dto.setRequestDate(request.getRequestDate());
@@ -195,6 +196,7 @@ public class RequestServiceImpl implements RequestService {
                     }
                     if (request.getEvent() != null) {
                         dto.setEventId(request.getEvent().getEventId());
+                        dto.setEventName(request.getEvent().getEventName());
 
                     }
                     dto.setRequestDate(request.getRequestDate());
@@ -354,7 +356,7 @@ public class RequestServiceImpl implements RequestService {
                 existingRequest.getRequestedParticipants().add(participant);
             }
         }
-        if ("APPROVED".equals(existingRequest.getRequestStatus()) || "CLOSED".equals(existingRequest.getRequestStatus())) {
+        if ("APPROVED".equals(existingRequest.getRequestStatus()) || "REJECTED".equals(existingRequest.getRequestStatus())) {
             Approval approval = approvalRepository.findByRequest_RequestId(existingRequest.getRequestId());
             if (approval == null) {
                 approval = new Approval();
