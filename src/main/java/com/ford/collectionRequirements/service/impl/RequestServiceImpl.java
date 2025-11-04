@@ -9,7 +9,6 @@ import com.ford.collectionRequirements.repository.UserInfoRepository;
 import com.ford.collectionRequirements.request.Request;
 import com.ford.collectionRequirements.approval.Approval;
 import com.ford.collectionRequirements.repository.*;
-import com.ford.collectionRequirements.request.Request;
 import com.ford.collectionRequirements.service.RequestService;
 import com.ford.collectionRequirements.user.UserInfo;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,16 +19,10 @@ import org.springframework.data.jpa.domain.Specification;
 import com.ford.collectionRequirements.dto.EditRequestDTO;
 import com.ford.collectionRequirements.event.Event;
 import com.ford.collectionRequirements.department.Department;
-import com.ford.collectionRequirements.user.UserInfo;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jakarta.persistence.EntityNotFoundException;
-
 import java.time.LocalDate;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -137,7 +130,7 @@ public class RequestServiceImpl implements RequestService {
         Long total = requestRepository.countByUser_UserId(requestorId);
         Long approved = requestRepository.countByUser_UserIdAndRequestStatus(requestorId, "APPROVED"); // Use actual status string
         Long pending = requestRepository.countByUser_UserIdAndRequestStatus(requestorId, "PENDING");
-        Long closed = requestRepository.countByUser_UserIdAndRequestStatus(requestorId, "CLOSED");
+        Long closed = requestRepository.countByUser_UserIdAndRequestStatus(requestorId, "REJECTED");
         return new RequestCountsDTO(total, approved, pending,closed);
     }
 
@@ -211,6 +204,46 @@ public class RequestServiceImpl implements RequestService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public RequestDetailsDTO getRequestDetails(Long requestId) {
+        Request request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new EntityNotFoundException("Request not found with id: " + requestId));
+
+        RequestDetailsDTO dto = new RequestDetailsDTO();
+        dto.setRequestId(request.getRequestId());
+        dto.setRequestorName(request.getUser().getFirstName() + " " + request.getUser().getLastName());
+        dto.setRequestorId(request.getUser().getUserId());
+        dto.setDepartmentId(request.getDepartment().getDepartmentId());
+        dto.setDepartmentName(request.getDepartment().getDepartmentName());
+        dto.setEventId(request.getEvent() != null ? request.getEvent().getEventId() : null);
+        dto.setEventName(request.getEvent() != null ? request.getEvent().getEventName() : null);
+        dto.setRequestDate(request.getRequestDate());
+        dto.setRequestStatus(request.getRequestStatus());
+        dto.setGroupRequest(request.getGroupRequest());
+        dto.setJustification(request.getJustification());
+        dto.setNoOfParticipants(request.getNoOfParticipants());
+        dto.setParticipants(request.getRequestedParticipants().stream().map(participant -> {
+            BasicUserDTO userDTO = new BasicUserDTO();
+            userDTO.setUserId(participant.getUserId());
+            userDTO.setUserName(participant.getFirstName() + " " + participant.getLastName());
+            userDTO.setRole(participant.getRole());
+            userDTO.setEmail(participant.getEmail());
+            userDTO.setDepartmentId(participant.getDepartment().getDepartmentId());
+            userDTO.setDepartmentName(participant.getDepartment().getDepartmentName());
+            userDTO.setManagerId(participant.getManager().getUserId());
+            userDTO.setManagerName(participant.getManager().getFirstName() + " " + participant.getManager().getLastName());
+            userDTO.setRegionId(participant.getRegion().getRegionId());
+            userDTO.setRegionName(participant.getRegion().getRegionName());
+
+            return userDTO;
+        }).collect(Collectors.toList()));
+        dto.setTanNumber(request.getTAN_Number());
+        dto.setCurriculumLink(request.getCurriculamLink());
+        return dto;
+
+
+
+    }
 
 
     @Override
@@ -278,7 +311,7 @@ public class RequestServiceImpl implements RequestService {
         Long total=requestRepository.count();
         Long approved=requestRepository.countByRequestStatus("APPROVED"); // Use actual status string
         Long pending=requestRepository.countByRequestStatus("PENDING");
-        Long closed=requestRepository.countByRequestStatus("CLOSED");
+        Long closed=requestRepository.countByRequestStatus("REJECTED");
         return new RequestCountsDTO(total,approved,pending,closed);
     }
 
@@ -315,9 +348,9 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     @Transactional
-    public Request updateRequest( EditRequestDTO editRequestDTO) {
+    public Request updateRequest(Long requestId, EditRequestDTO editRequestDTO) {
 
-        Request existingRequest = requestRepository.findById(editRequestDTO.getRequestId())
+        Request existingRequest = requestRepository.findById(requestId)
                 .orElseThrow(() -> new EntityNotFoundException("Request not found with id: " + editRequestDTO.getRequestId()));
         UserInfo requestor= userInfoRepository.findById(editRequestDTO.getRequestorId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + editRequestDTO.getRequestorId()));

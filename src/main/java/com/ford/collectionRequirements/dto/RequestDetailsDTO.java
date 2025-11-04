@@ -1,11 +1,13 @@
 package com.ford.collectionRequirements.dto;
 
 
+import com.ford.collectionRequirements.user.UserInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -26,6 +28,7 @@ public class RequestDetailsDTO {
     private Long noOfParticipants;
     private String tanNumber;
     private String curriculumLink;
+    private List<BasicUserDTO> participants; // List of UserInfo for participants
 
 
 }

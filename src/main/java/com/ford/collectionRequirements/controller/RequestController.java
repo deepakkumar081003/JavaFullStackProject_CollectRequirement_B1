@@ -109,11 +109,16 @@ public class RequestController {
         }
     }
 
+    @GetMapping("/id/{requestId}")
+    public ResponseEntity<RequestDetailsDTO> getRequestById(@PathVariable Long requestId) {
+        RequestDetailsDTO requestDetailsDTO = requestService.getRequestDetails(requestId);
+        return ResponseEntity.ok(requestDetailsDTO);
+    }
 
-    @PutMapping("/{requestId}")
-    public ResponseEntity<Request> updateRequest(@RequestBody EditRequestDTO editRequestDTO) {
+    @PutMapping("/edit/{requestId}")
+    public ResponseEntity<Request> updateRequest(@PathVariable Long requestId,@RequestBody EditRequestDTO editRequestDTO) {
         try {
-            Request savedRequest = requestService.updateRequest(editRequestDTO);
+            Request savedRequest = requestService.updateRequest(requestId,editRequestDTO);
             return ResponseEntity.ok(savedRequest);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -129,7 +134,6 @@ public class RequestController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-
 
     @GetMapping("/users")
     public ResponseEntity<List<BasicUserDTO>> getAllUsers() {
