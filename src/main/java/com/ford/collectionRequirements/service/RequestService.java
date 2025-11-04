@@ -32,12 +32,14 @@ public interface RequestService {
             LocalDate toDate
     );
 
+    RequestDetailsDTO getRequestDetails(Long requestId);
+
     RequestDetailsDTO createRequest(CreateRequestDTO createRequestDTO);
 
 
     RequestCountsDTO getAllRequestsSummaryCounts(Long requestorId);
 
     List<BasicUserDTO> getAllUsers();
-    Request updateRequest( EditRequestDTO editRequestDTO);
+    Request updateRequest( Long requestId ,EditRequestDTO editRequestDTO);
     void deleteRequest(Long requestId);
 }
