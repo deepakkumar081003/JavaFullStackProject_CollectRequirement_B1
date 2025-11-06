@@ -367,7 +367,8 @@ public class RequestServiceImpl implements RequestService {
         existingRequest.setUser(requestor);
         existingRequest.setDepartment(department);
 //        existingRequest.setEvent(event);
-        existingRequest.setRequestDate(LocalDate.now());
+
+        existingRequest.setRequestDate(editRequestDTO.getRequestDate());
         existingRequest.setRequestStatus(editRequestDTO.getRequestStatus());
         existingRequest.setGroupRequest(editRequestDTO.getGroupRequest());
         existingRequest.setJustification(editRequestDTO.getJustification());
@@ -396,6 +397,7 @@ public class RequestServiceImpl implements RequestService {
                 approval.setRequest(existingRequest);
             }
             approval.setApprovalDate(LocalDate.now());
+            approval.setApprovalNotes(editRequestDTO.getApprovalNotes());
 
             UserInfo approver=userInfoRepository.findById(editRequestDTO.getApprovedBy())
                     .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + editRequestDTO.getApprovedBy()));

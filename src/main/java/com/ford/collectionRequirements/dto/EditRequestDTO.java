@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -15,9 +16,10 @@ public class EditRequestDTO {
     private Long requestId;
     private Long requestorId;
     private Long approvedBy;
+    private String approvalNotes;
     private Long departmentId;
     private Long eventId;
-    private Date requestDate;
+    private LocalDate requestDate;
     private String requestStatus;
     private Boolean groupRequest;
     private String justification;
