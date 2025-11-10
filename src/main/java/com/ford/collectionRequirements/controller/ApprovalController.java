@@ -6,8 +6,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/approvals")
 public class ApprovalController {
-    //kevin
-    //This is a placeholder for ApprovalController
-    //This is a change from Deepak
-    //This is Deepak again
+  // Implementation Not needed as of now because approval table is managed internally
 }
