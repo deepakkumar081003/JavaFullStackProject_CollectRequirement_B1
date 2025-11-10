@@ -5,4 +5,5 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ApprovalServiceImpl implements ApprovalService {
+    // Implementation Not needed as of now because approval table is managed internally
 }

@@ -4,6 +4,8 @@ import com.ford.collectionRequirements.dto.BasicUserDTO;
 import com.ford.collectionRequirements.dto.CreateRequestDTO;
 import com.ford.collectionRequirements.dto.RequestCountsDTO;
 import com.ford.collectionRequirements.dto.RequestDetailsDTO;
+import com.ford.collectionRequirements.exception.RequestNotFoundException;
+import com.ford.collectionRequirements.exception.UnauthorizedActionException;
 import com.ford.collectionRequirements.repository.RequestRepository;
 import com.ford.collectionRequirements.repository.UserInfoRepository;
 import com.ford.collectionRequirements.request.Request;
@@ -25,15 +27,14 @@ import java.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class RequestServiceImpl implements RequestService {
-    private ApprovalRepository approvalRepository;
-    private RequestRepository requestRepository;
-    private DepartmentRepository departmentRepository;
-    private EventRepository eventRepository;
-    private UserInfoRepository userInfoRepository;
+    private final ApprovalRepository approvalRepository;
+    private final RequestRepository requestRepository;
+    private final DepartmentRepository departmentRepository;
+    private final EventRepository eventRepository;
+    private final UserInfoRepository userInfoRepository;
 
 
     @Autowired
@@ -45,11 +46,14 @@ public class RequestServiceImpl implements RequestService {
         this.userInfoRepository = userInfoRepository;
     }
 
+    // lnd tasks
+
+    // To get all the requests submitted by the requestors(lc) with filters
     @Override
     public List<RequestDetailsDTO> getAllRequests(Long ldUserId, String status, String departmentName,String eventName, String requestorName , LocalDate fromDate, LocalDate toDate) {
 
         if(ldUserId < 21 || ldUserId > 26){
-            throw new SecurityException("Unauthorized access. Admin privileges required.");
+            throw new UnauthorizedActionException("Unauthorized access. Admin privileges required.");
         }
 
         Specification<Request> spec = (root, query, criteriaBuilder) -> {
@@ -90,7 +94,7 @@ public class RequestServiceImpl implements RequestService {
     };
 
 
-    List<Request> requests = requestRepository.findAll((spec)); // Use findAll with Specification
+    List<Request> requests = requestRepository.findAll((spec));
 
     List<RequestDetailsDTO> requestDetailList=new ArrayList<>();
         for(Request request:requests){
@@ -124,17 +128,67 @@ public class RequestServiceImpl implements RequestService {
         return requestDetailList;
 
 }
-
+    // To get request counts for lnd user
     @Override
-    public RequestCountsDTO getRequestSummaryCounts(Long requestorId) {
-        Long total = requestRepository.countByUser_UserId(requestorId);
-        Long approved = requestRepository.countByUser_UserIdAndRequestStatus(requestorId, "APPROVED"); // Use actual status string
-        Long pending = requestRepository.countByUser_UserIdAndRequestStatus(requestorId, "PENDING");
-        Long closed = requestRepository.countByUser_UserIdAndRequestStatus(requestorId, "REJECTED");
-        return new RequestCountsDTO(total, approved, pending,closed);
+    public RequestCountsDTO getAllRequestsSummaryCounts(Long requestorId) {
+
+        //Admin ids are 21 to 26 check if requestorId is in this range
+        if(requestorId < 21 || requestorId > 26){
+            throw new UnauthorizedActionException("Unauthorized access. Admin privileges required.");
+        }
+
+        Long total=requestRepository.count();
+        Long approved=requestRepository.countByRequestStatus("APPROVED"); // Use actual status string
+        Long pending=requestRepository.countByRequestStatus("PENDING");
+        Long closed=requestRepository.countByRequestStatus("REJECTED");
+        return new RequestCountsDTO(total,approved,pending,closed);
+    }
+
+    //To get request details by request id
+    @Override
+    public RequestDetailsDTO getRequestDetails(Long requestId) {
+        Request request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new RequestNotFoundException("Request not found with id: " + requestId));
+
+        RequestDetailsDTO dto = new RequestDetailsDTO();
+        dto.setRequestId(request.getRequestId());
+        dto.setRequestorName(request.getUser().getFirstName() + " " + request.getUser().getLastName());
+        dto.setRequestorId(request.getUser().getUserId());
+        dto.setDepartmentId(request.getDepartment().getDepartmentId());
+        dto.setDepartmentName(request.getDepartment().getDepartmentName());
+        dto.setEventId(request.getEvent() != null ? request.getEvent().getEventId() : null);
+        dto.setEventName(request.getEvent() != null ? request.getEvent().getEventName() : null);
+        dto.setRequestDate(request.getRequestDate());
+        dto.setRequestStatus(request.getRequestStatus());
+        dto.setGroupRequest(request.getGroupRequest());
+        dto.setJustification(request.getJustification());
+        dto.setNoOfParticipants(request.getNoOfParticipants());
+        dto.setParticipants(request.getRequestedParticipants().stream().map(participant -> {
+            BasicUserDTO userDTO = new BasicUserDTO();
+            userDTO.setUserId(participant.getUserId());
+            userDTO.setUserName(participant.getFirstName() + " " + participant.getLastName());
+            userDTO.setRole(participant.getRole());
+            userDTO.setEmail(participant.getEmail());
+            userDTO.setDepartmentId(participant.getDepartment().getDepartmentId());
+            userDTO.setDepartmentName(participant.getDepartment().getDepartmentName());
+            userDTO.setManagerId(participant.getManager().getUserId());
+            userDTO.setManagerName(participant.getManager().getFirstName() + " " + participant.getManager().getLastName());
+            userDTO.setRegionId(participant.getRegion().getRegionId());
+            userDTO.setRegionName(participant.getRegion().getRegionName());
+
+            return userDTO;
+        }).toList());
+        dto.setTanNumber(request.getTAN_Number());
+        dto.setCurriculumLink(request.getCurriculamLink());
+        return dto;
+
+
     }
 
 
+    //lc tasks
+
+    // To get all the requests submitted by the user(lc) with filters
     @Override
     public List<RequestDetailsDTO> getFilteredRequests(
             Long lcUserId,
@@ -201,51 +255,24 @@ public class RequestServiceImpl implements RequestService {
                     dto.setCurriculumLink(request.getCurriculamLink());
                     return dto;
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
+    // To get request counts for user
     @Override
-    public RequestDetailsDTO getRequestDetails(Long requestId) {
-        Request request = requestRepository.findById(requestId)
-                .orElseThrow(() -> new EntityNotFoundException("Request not found with id: " + requestId));
-
-        RequestDetailsDTO dto = new RequestDetailsDTO();
-        dto.setRequestId(request.getRequestId());
-        dto.setRequestorName(request.getUser().getFirstName() + " " + request.getUser().getLastName());
-        dto.setRequestorId(request.getUser().getUserId());
-        dto.setDepartmentId(request.getDepartment().getDepartmentId());
-        dto.setDepartmentName(request.getDepartment().getDepartmentName());
-        dto.setEventId(request.getEvent() != null ? request.getEvent().getEventId() : null);
-        dto.setEventName(request.getEvent() != null ? request.getEvent().getEventName() : null);
-        dto.setRequestDate(request.getRequestDate());
-        dto.setRequestStatus(request.getRequestStatus());
-        dto.setGroupRequest(request.getGroupRequest());
-        dto.setJustification(request.getJustification());
-        dto.setNoOfParticipants(request.getNoOfParticipants());
-        dto.setParticipants(request.getRequestedParticipants().stream().map(participant -> {
-            BasicUserDTO userDTO = new BasicUserDTO();
-            userDTO.setUserId(participant.getUserId());
-            userDTO.setUserName(participant.getFirstName() + " " + participant.getLastName());
-            userDTO.setRole(participant.getRole());
-            userDTO.setEmail(participant.getEmail());
-            userDTO.setDepartmentId(participant.getDepartment().getDepartmentId());
-            userDTO.setDepartmentName(participant.getDepartment().getDepartmentName());
-            userDTO.setManagerId(participant.getManager().getUserId());
-            userDTO.setManagerName(participant.getManager().getFirstName() + " " + participant.getManager().getLastName());
-            userDTO.setRegionId(participant.getRegion().getRegionId());
-            userDTO.setRegionName(participant.getRegion().getRegionName());
-
-            return userDTO;
-        }).collect(Collectors.toList()));
-        dto.setTanNumber(request.getTAN_Number());
-        dto.setCurriculumLink(request.getCurriculamLink());
-        return dto;
-
-
-
+    public RequestCountsDTO getRequestSummaryCounts(Long requestorId) {
+        Long total = requestRepository.countByUser_UserId(requestorId);
+        Long approved = requestRepository.countByUser_UserIdAndRequestStatus(requestorId, "APPROVED"); // Use actual status string
+        Long pending = requestRepository.countByUser_UserIdAndRequestStatus(requestorId, "PENDING");
+        Long closed = requestRepository.countByUser_UserIdAndRequestStatus(requestorId, "REJECTED");
+        return new RequestCountsDTO(total, approved, pending,closed);
     }
 
 
+
+    //Both lc and lnd tasks
+
+    //To get create a new request
     @Override
     @Transactional // Ensure the operation is transactional
     public RequestDetailsDTO createRequest(CreateRequestDTO createRequestDTO) {
@@ -300,27 +327,12 @@ public class RequestServiceImpl implements RequestService {
         return dto;
     }
 
-    @Override
-    public RequestCountsDTO getAllRequestsSummaryCounts(Long requestorId) {
 
-        //Admin ids are 21 to 26 check if requestorId is in this range
-        if(requestorId < 21 || requestorId > 26){
-            throw new SecurityException("Unauthorized access. Admin privileges required.");
-        }
-
-        Long total=requestRepository.count();
-        Long approved=requestRepository.countByRequestStatus("APPROVED"); // Use actual status string
-        Long pending=requestRepository.countByRequestStatus("PENDING");
-        Long closed=requestRepository.countByRequestStatus("REJECTED");
-        return new RequestCountsDTO(total,approved,pending,closed);
-    }
-
+    // To get all users for participant selection
     @Override
     public List<BasicUserDTO> getAllUsers() {
 
         List<UserInfo> users=userInfoRepository.findAll();
-
-        //from users i have first name and last name i need to concatenate and then send it as username
 
         return users.stream()
                 .map(user -> {
@@ -337,21 +349,20 @@ public class RequestServiceImpl implements RequestService {
                     dto.setRegionName(user.getRegion().getRegionName());
                     return dto;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
 
     }
 
+    //---------------------------------------------------------------------------------
 
-
-
-
+    // To update a request by id
     @Override
     @Transactional
     public Request updateRequest(Long requestId, EditRequestDTO editRequestDTO) {
 
         Request existingRequest = requestRepository.findById(requestId)
-                .orElseThrow(() -> new EntityNotFoundException("Request not found with id: " + editRequestDTO.getRequestId()));
+                .orElseThrow(() -> new RequestNotFoundException("Request not found with id: " + editRequestDTO.getRequestId()));
         UserInfo requestor= userInfoRepository.findById(editRequestDTO.getRequestorId())
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + editRequestDTO.getRequestorId()));
 
@@ -367,7 +378,8 @@ public class RequestServiceImpl implements RequestService {
         existingRequest.setUser(requestor);
         existingRequest.setDepartment(department);
 //        existingRequest.setEvent(event);
-        existingRequest.setRequestDate(LocalDate.now());
+
+        existingRequest.setRequestDate(editRequestDTO.getRequestDate());
         existingRequest.setRequestStatus(editRequestDTO.getRequestStatus());
         existingRequest.setGroupRequest(editRequestDTO.getGroupRequest());
         existingRequest.setJustification(editRequestDTO.getJustification());
@@ -396,6 +408,7 @@ public class RequestServiceImpl implements RequestService {
                 approval.setRequest(existingRequest);
             }
             approval.setApprovalDate(LocalDate.now());
+            approval.setApprovalNotes(editRequestDTO.getApprovalNotes());
 
             UserInfo approver=userInfoRepository.findById(editRequestDTO.getApprovedBy())
                     .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + editRequestDTO.getApprovedBy()));
@@ -408,20 +421,14 @@ public class RequestServiceImpl implements RequestService {
         return requestRepository.save(existingRequest);
 
 
-
-
     }
 
+    // To delete a request by id
     @Override
     @Transactional
     public void deleteRequest(Long requestId) {
-//        Approval approval = approvalRepository.findByRequest_RequestId(requestId);
-//        if (approval != null) {
-//            approvalRepository.delete(approval);
-//        }
-
         if (!requestRepository.existsById(requestId)) {
-            throw new EntityNotFoundException("Request not found with id: " + requestId);
+            throw new RequestNotFoundException("Request not found with id: " + requestId);
         }
         requestRepository.deleteById(requestId);
     }
