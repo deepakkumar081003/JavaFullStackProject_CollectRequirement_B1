@@ -37,10 +37,14 @@ public class EventController {
     public Event getEventById(@PathVariable Long id) {
         return eventService.getEventById(id);
     }
+
+    // GET REQUESTS FOR A SPECIFIC EVENT
     @GetMapping("/{id}/requests")
     public List<Request> getRequestsForEvent(@PathVariable("id") Long eventId) {
         return eventService.getRequestsByEventId(eventId);
     }
+
+    // UPDATE EVENT DETAILS
     @PutMapping("/{id}")
     public ResponseEntity<Event> updateEvent(@PathVariable Long id, @RequestBody Event updatedEvent) {
         try {
@@ -50,6 +54,8 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
+    // ASSIGN REQUEST TO EVENT
     @PutMapping("/{eventId}/requests/{requestId}/add")
     public Request assignExistingRequestToEvent(
             @PathVariable Long eventId,
@@ -61,6 +67,8 @@ public class EventController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
         }
     }
+
+    // REMOVE REQUEST FROM EVENT
     @PutMapping("/{eventId}/requests/{requestId}/remove")
     public Request removeExistingRequestFromEvent(
             @PathVariable Long eventId,
@@ -72,6 +80,7 @@ public class EventController {
         }
     }
 
+    // FOR GETTING ALL EVENTS WITH FILTERS
     @GetMapping
     public List<EventDTO> getAllEvents(
             @RequestParam(required = false) String searchTerm,
