@@ -1,7 +1,6 @@
 package com.ford.collectionRequirements.dto;
 
 
-import com.ford.collectionRequirements.user.UserInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
 package com.ford.collectionRequirements.exception;
 
-public class RequestNotFoundException extends RuntimeException {
+public class RequestNotFoundException extends Exception {
     public RequestNotFoundException(String message) {
         super(message);
     }

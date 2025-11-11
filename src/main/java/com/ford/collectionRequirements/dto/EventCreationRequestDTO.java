@@ -1,6 +1,6 @@
 package com.ford.collectionRequirements.dto;
 
-import com.ford.collectionRequirements.event.Event; // Assuming Event is in this package
+import com.ford.collectionRequirements.entity.Event; // Assuming Event is in this package
 import java.util.List;
 
 public class EventCreationRequestDTO {

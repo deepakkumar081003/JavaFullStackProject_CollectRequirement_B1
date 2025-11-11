@@ -16,5 +16,4 @@ public class CreateRequestDTO {
     private String tanNumber;
     private String curriculumLink;
     private List<Long> participantUserIds; // List of user IDs for participants
-    // No eventId here, as per your instruction that requestor can't assign it
 }
