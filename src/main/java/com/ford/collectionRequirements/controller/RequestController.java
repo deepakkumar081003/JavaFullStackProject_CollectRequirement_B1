@@ -4,15 +4,16 @@ import com.ford.collectionRequirements.dto.BasicUserDTO;
 import com.ford.collectionRequirements.dto.CreateRequestDTO;
 import com.ford.collectionRequirements.dto.RequestCountsDTO;
 import com.ford.collectionRequirements.dto.RequestDetailsDTO;
+import com.ford.collectionRequirements.exception.RequestNotFoundException;
+import com.ford.collectionRequirements.exception.UnauthorizedActionException;
 import com.ford.collectionRequirements.service.RequestService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
-import com.ford.collectionRequirements.request.Request;
+import com.ford.collectionRequirements.entity.Request;
 import com.ford.collectionRequirements.dto.EditRequestDTO;
 
 @RestController
@@ -39,14 +40,14 @@ public class RequestController {
             @RequestParam(value = "requestorName", required = false) String requestorName,
             @RequestParam(value = "fromDate", required = false) LocalDate fromDate,
             @RequestParam(value = "toDate", required = false) LocalDate toDate
-    ) {
+    ) throws UnauthorizedActionException {
         List<RequestDetailsDTO> requests = requestService.getAllRequests(ldUserId, status, departmentName, eventName, requestorName, fromDate, toDate);
         return ResponseEntity.ok(requests);
     }
 
     // To get request counts for lnd user
     @GetMapping("all/counts/{ldUserId}")
-    public ResponseEntity<RequestCountsDTO> getAllRequestSummaryForUser(@PathVariable Long ldUserId) {
+    public ResponseEntity<RequestCountsDTO> getAllRequestSummaryForUser(@PathVariable Long ldUserId) throws UnauthorizedActionException {
         RequestCountsDTO counts = requestService.getAllRequestsSummaryCounts(ldUserId);
         return ResponseEntity.ok(counts);
     }
@@ -87,7 +88,7 @@ public class RequestController {
 
     // To get the details of a specific request by its ID
     @GetMapping("/id/{requestId}")
-    public ResponseEntity<RequestDetailsDTO> getRequestById(@PathVariable Long requestId) {
+    public ResponseEntity<RequestDetailsDTO> getRequestById(@PathVariable Long requestId) throws RequestNotFoundException {
         RequestDetailsDTO requestDetailsDTO = requestService.getRequestDetails(requestId);
         return ResponseEntity.ok(requestDetailsDTO);
     }
@@ -106,14 +107,14 @@ public class RequestController {
 
     // To update a request
     @PutMapping("/edit/{requestId}")
-    public ResponseEntity<Request> updateRequest(@PathVariable Long requestId, @RequestBody EditRequestDTO editRequestDTO) {
+    public ResponseEntity<Request> updateRequest(@PathVariable Long requestId, @RequestBody EditRequestDTO editRequestDTO) throws RequestNotFoundException {
         Request savedRequest = requestService.updateRequest(requestId, editRequestDTO);
         return ResponseEntity.ok(savedRequest);
     }
 
     // To delete a request
     @DeleteMapping("/delete/{requestId}")
-    public ResponseEntity<Void> deleteRequest(@PathVariable Long requestId) {
+    public ResponseEntity<Void> deleteRequest(@PathVariable Long requestId) throws RequestNotFoundException {
         requestService.deleteRequest(requestId);
         return ResponseEntity.noContent().build();
     }

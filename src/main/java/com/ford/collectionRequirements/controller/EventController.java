@@ -2,24 +2,19 @@ package com.ford.collectionRequirements.controller;
 
 
 import com.ford.collectionRequirements.dto.EventDTO;
-import com.ford.collectionRequirements.request.Request;
+import com.ford.collectionRequirements.entity.Request;
 import com.ford.collectionRequirements.dto.EventCreationRequestDTO;
-import com.ford.collectionRequirements.event.Event;
-import com.ford.collectionRequirements.request.Request;
+import com.ford.collectionRequirements.entity.Event;
 import com.ford.collectionRequirements.service.EventService;
 import jakarta.persistence.EntityNotFoundException;
-import org.apache.logging.log4j.message.ReusableMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.ford.collectionRequirements.event.Event;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/events")

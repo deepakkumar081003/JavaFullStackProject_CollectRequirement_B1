@@ -1,6 +1,6 @@
 package com.ford.collectionRequirements.repository;
 
-import com.ford.collectionRequirements.department.Department;
+import com.ford.collectionRequirements.entity.Department;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

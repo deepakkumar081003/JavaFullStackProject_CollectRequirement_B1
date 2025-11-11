@@ -1,13 +1,11 @@
-package com.ford.collectionRequirements.department;
+package com.ford.collectionRequirements.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ford.collectionRequirements.request.Request;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import com.ford.collectionRequirements.user.UserInfo;
 
 import java.util.List;
 

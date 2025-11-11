@@ -1,6 +1,6 @@
 package com.ford.collectionRequirements.repository;
 
-import com.ford.collectionRequirements.event.Event;
+import com.ford.collectionRequirements.entity.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;

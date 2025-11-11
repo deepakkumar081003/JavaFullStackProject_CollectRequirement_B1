@@ -1,12 +1,11 @@
 package com.ford.collectionRequirements.service.impl;
 
 import com.ford.collectionRequirements.dto.EventDTO;
-import com.ford.collectionRequirements.event.Event;
+import com.ford.collectionRequirements.entity.Event;
 import com.ford.collectionRequirements.dto.EventCreationRequestDTO;
-import com.ford.collectionRequirements.event.Event;
 import com.ford.collectionRequirements.repository.EventRepository;
 import com.ford.collectionRequirements.repository.RequestRepository;
-import com.ford.collectionRequirements.request.Request;
+import com.ford.collectionRequirements.entity.Request;
 import com.ford.collectionRequirements.service.EventService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -19,8 +18,6 @@ import java.util.Optional;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

@@ -9,7 +9,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.ford.collectionRequirements.dto.EditRequestDTO;
-import com.ford.collectionRequirements.request.Request;
+import com.ford.collectionRequirements.entity.Request;
+import com.ford.collectionRequirements.exception.RequestNotFoundException;
+import com.ford.collectionRequirements.exception.UnauthorizedActionException;
 
 public interface RequestService {
     List<RequestDetailsDTO> getAllRequests(
@@ -20,7 +22,7 @@ public interface RequestService {
             String requestorName,
             LocalDate fromDate,
             LocalDate toDate
-    );
+    ) throws UnauthorizedActionException;
     RequestCountsDTO getRequestSummaryCounts(Long requestorId);
 
     List<RequestDetailsDTO> getFilteredRequests(
@@ -32,14 +34,14 @@ public interface RequestService {
             LocalDate toDate
     );
 
-    RequestDetailsDTO getRequestDetails(Long requestId);
+    RequestDetailsDTO getRequestDetails(Long requestId) throws RequestNotFoundException;
 
     RequestDetailsDTO createRequest(CreateRequestDTO createRequestDTO);
 
 
-    RequestCountsDTO getAllRequestsSummaryCounts(Long requestorId);
+    RequestCountsDTO getAllRequestsSummaryCounts(Long requestorId) throws UnauthorizedActionException;
 
     List<BasicUserDTO> getAllUsers();
-    Request updateRequest( Long requestId ,EditRequestDTO editRequestDTO);
-    void deleteRequest(Long requestId);
+    Request updateRequest( Long requestId ,EditRequestDTO editRequestDTO) throws RequestNotFoundException;
+    void deleteRequest(Long requestId) throws RequestNotFoundException;
 }

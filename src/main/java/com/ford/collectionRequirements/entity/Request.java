@@ -1,15 +1,11 @@
-package com.ford.collectionRequirements.request;
+package com.ford.collectionRequirements.entity;
 
-import com.ford.collectionRequirements.approval.Approval;
-import com.ford.collectionRequirements.event.Event;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ford.collectionRequirements.department.Department;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import com.ford.collectionRequirements.user.UserInfo;
 
 import java.time.LocalDate;
 import java.util.List;

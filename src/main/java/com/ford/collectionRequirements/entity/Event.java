@@ -1,7 +1,6 @@
-package com.ford.collectionRequirements.event;
+package com.ford.collectionRequirements.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ford.collectionRequirements.request.Request;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
