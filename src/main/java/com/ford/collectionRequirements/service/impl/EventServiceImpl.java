@@ -36,17 +36,21 @@ public class EventServiceImpl implements EventService {
         this.requestRepository = requestRepository;
     }
 
+    // Get Event by ID
     @Override
     public Event getEventById(Long id) {
         Optional<Event> event = eventRepository.findById(id);
         return event.orElse(null);
     }
 
+    // Get Requests associated with an Event
     @Override
     public List<Request> getRequestsByEventId(Long eventId) {
 
         return requestRepository.findByEvent_EventId(eventId);
     }
+
+    // Update Event details
     @Override
     @Transactional
     public Event updateEvent(Long eventId, Event updatedEvent) {
@@ -62,6 +66,8 @@ public class EventServiceImpl implements EventService {
         existingEvent.setStatus(updatedEvent.getStatus());
         return eventRepository.save(existingEvent);
     }
+
+    // Assign existing Request to Event
     @Override
     @Transactional
     public Request assignExistingRequestToEvent(Long eventId, Long requestId) {
@@ -72,10 +78,13 @@ public class EventServiceImpl implements EventService {
         request.setEvent(event);
         Integer eventParticipants = event.getParticipantsCount() != null ? event.getParticipantsCount() : 0;
         Long requestParticipants = request.getNoOfParticipants() != null ? request.getNoOfParticipants() : 0L;
+        // Update participants count
         event.setParticipantsCount(eventParticipants + requestParticipants.intValue());
         eventRepository.save(event);
         return requestRepository.save(request);
     }
+
+    // Remove existing Request from Event
     @Override
     @Transactional
     public Request removeExistingRequestFromEvent(Long eventId, Long requestId) {
@@ -88,12 +97,14 @@ public class EventServiceImpl implements EventService {
         Long requestParticipants = request.getNoOfParticipants() != null ? request.getNoOfParticipants() : 0L;
         request.setEvent(null);
 
+        // Update participants count
         int updatedCount = eventParticipants - requestParticipants.intValue();
         event.setParticipantsCount(updatedCount);
         eventRepository.save(event);
         return requestRepository.save(request);
     }
 
+    // Get all Events with filtering
     public List<EventDTO> getAllEvents(
             String searchTerm,
             String description,
@@ -114,6 +125,7 @@ public class EventServiceImpl implements EventService {
                 effectiveStatus
         );
 
+        // Convert List<Event> to List<EventDTO>
         return events.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
@@ -134,6 +146,7 @@ public class EventServiceImpl implements EventService {
         return dto;
     }
 
+    // Create Event with associated Requests
     @Override
     public Event createEvent(EventCreationRequestDTO eventCreationRequestDTO) {
         int participantcount=0;
@@ -141,6 +154,7 @@ public class EventServiceImpl implements EventService {
         Event newEvent = eventCreationRequestDTO.getNewEvent();
         List<Long> requests = eventCreationRequestDTO.getRequests();
 
+        // Calculate total participants from associated requests
         for (Long requestId : requests) {
             Optional<Request> optionalRequest = requestRepository.findById(requestId);
             if (optionalRequest.isPresent()) {
@@ -149,9 +163,11 @@ public class EventServiceImpl implements EventService {
             }
         }
 
+        // Set the calculated participants count to the new event
         newEvent.setParticipantsCount(participantcount);
         Event savedEvent = eventRepository.save(newEvent);
 
+        // Associate requests with the newly created event
         for (Long requestId : requests) {
             Optional<Request> optionalRequest = requestRepository.findById(requestId);
             if (optionalRequest.isPresent()) {
@@ -160,11 +176,10 @@ public class EventServiceImpl implements EventService {
                 this.requestRepository.save(request);
             }
         }
-
         return savedEvent;
-
     }
 
+    // Get all new approved requests not assigned to any event
     @Override
     public List<Request> getAllNewApprovedRequestsNotAssignedToEvent() {
         Collection<Request> collectionRequests=this.requestRepository.getAllNewApprovedRequestsNotAssignedToEvent();
@@ -172,16 +187,19 @@ public class EventServiceImpl implements EventService {
         return requests;
     }
 
+    // Search Requests by ID
     @Override
     public Request getAllRequestsForSeachById(Long requestid) {
         return this.requestRepository.findById(requestid).get();
     }
 
+    // Search Requests by Name
     @Override
     public List<Request> getAllRequestsForSeachByName(String requestName) {
         return this.requestRepository.findByJustificationContainsIgnoreCase(requestName);
     }
 
+    // Delete Event and dissociate from Requests
     @Override
     public Event deleteEvent(Long eventid) {
 
@@ -189,6 +207,8 @@ public class EventServiceImpl implements EventService {
         if (optionalEvent.isPresent()) {
             Event event=optionalEvent.get();
             List<Request> requests = this.requestRepository.findByEvent(event);
+
+            // Dissociate each request from the event
             for (Request request : requests) {
                 request.setEvent(null);
                 this.requestRepository.save(request);
@@ -198,9 +218,6 @@ public class EventServiceImpl implements EventService {
         }
 
         return null;
-
-
     }
-
 
 }
